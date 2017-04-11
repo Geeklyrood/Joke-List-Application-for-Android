@@ -1,10 +1,14 @@
 package edu.cvtc.android.jokelist;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -52,6 +56,8 @@ public class mainActivity extends AppCompatActivity {
         for (final String jokeText : jokes) {
             addJoke(jokeText);
         }
+
+        initListeners();
     }
 
     /**
@@ -89,6 +95,55 @@ public class mainActivity extends AppCompatActivity {
         container.addView(jokeScrollView);
 
         setContentView(container);
+    }
+
+    /**
+     * Method used to provide event listeners to our Views
+     */
+    private void initListeners() {
+        addJokeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addJokeFromEditText();
+            }
+        });
+        jokeEditText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int keyCode, KeyEvent keyEvent) {
+
+                if (keyEvent.getAction() == KeyEvent.ACTION_UP) {
+
+                    switch (keyCode) {
+                        case KeyEvent.KEYCODE_NUMPAD_ENTER:
+                        case KeyEvent.KEYCODE_ENTER:
+                            addJokeFromEditText();
+                            return true;
+                        default:
+                            break;
+                    }
+
+                }
+
+                return false;
+            }
+        });
+    }
+
+    private void addJokeFromEditText() {
+        final String jokeText = jokeEditText.getText().toString().trim();
+        addJoke(jokeText);
+        jokeEditText.setText("");
+
+        hideSoftKeyboard();
+    }
+
+    private void hideSoftKeyboard() {
+        final View view = getCurrentFocus();
+        if (view != null) {
+            final InputMethodManager keyboard = (InputMethodManager)
+                    getSystemService(Context.INPUT_METHOD_SERVICE);
+            keyboard.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     /**
